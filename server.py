@@ -38,7 +38,7 @@ def create_user():
         cur.execute("INSERT INTO users (firstname, lastname, email) VALUES (%s, %s, %s)", (firstname, lastname, email))
         mysql.connection.commit()
         
-        # Fetch the updated list of jobs
+        # Fetch the updated list of users
         cur.execute("SELECT id, firstname, lastname, email FROM users")
         users = cur.fetchall()
         session['users'] = users
@@ -57,7 +57,25 @@ def delete_user(id):
     session['users'] = users
     cur.close()
 
-    return redirect(url_for('comprofile',id=session['id']))
+    return redirect(url_for('home'))
+
+@app.route('/edit_user/<int:id>', methods=['POST'])
+def edit_user(id):
+    firstname = request.form['firstname']
+    lastname = request.form['lastname']
+    email = request.form['email']
+
+    cur = mysql.connection.cursor()
+    cur.execute("UPDATE users SET firstname=%s, lastname=%s, email=%s WHERE id=%s", (firstname, lastname, email, id))
+    mysql.connection.commit()
+
+    cur.execute("SELECT id, firstname, lastname, email FROM users")
+    users = cur.fetchall()
+    session['users'] = users
+    cur.close()
+    
+
+    return redirect(url_for('home'))
 
 
 if  __name__ == '__main__':
